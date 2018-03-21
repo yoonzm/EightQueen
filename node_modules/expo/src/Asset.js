@@ -9,6 +9,9 @@ import Constants from './Constants';
 
 const FS = NativeModules.ExponentFileSystem;
 
+// Fast lookup check if assets are available in the local bundle.
+const bundledAssets = new Set(FS.bundledAssets || []);
+
 // Return { uri, hash } for an asset's file, picking the correct scale, based on its React Native
 // metadata. If the asset isn't an image just picks the first file.
 const pickScale = meta => {
@@ -66,14 +69,25 @@ const pickScale = meta => {
   };
 };
 
+// Returns the uri of an asset from its hash and type or null if the asset is
+// not included in the app bundle.
+const getUriInBundle = (hash, type) => {
+  const assetName = 'asset_' + hash + (type ? '.' + type : '');
+  if (Constants.appOwnership !== 'standalone' || !bundledAssets.has(assetName)) {
+    return null;
+  }
+  return `${FS.bundleDirectory}${assetName}`;
+};
+
 export default class Asset {
-  static byModule = {};
+  static byHash = {};
 
   constructor({ name, type, hash, uri, width, height }) {
     this.name = name;
     this.type = type;
     this.hash = hash;
     this.uri = uri;
+    this.localUri = getUriInBundle(hash, type);
     if (typeof width === 'number') {
       this.width = width;
     }
@@ -82,7 +96,7 @@ export default class Asset {
     }
 
     this.downloading = false;
-    this.downloaded = false;
+    this.downloaded = !!this.localUri;
     this.downloadCallbacks = [];
   }
 
@@ -92,13 +106,18 @@ export default class Asset {
   }
 
   static fromModule(moduleId) {
-    if (Asset.byModule[moduleId]) {
-      return Asset.byModule[moduleId];
+    const meta = AssetRegistry.getAssetByID(moduleId);
+    return Asset.fromMetadata(meta);
+  }
+
+  static fromMetadata(meta) {
+    // The hash of the whole asset, not to confuse with the hash of a specific
+    // file returned from `pickScale`.
+    const metaHash = meta.hash;
+    if (Asset.byHash[metaHash]) {
+      return Asset.byHash[metaHash];
     }
 
-    // TODO(nikki): Make React Native's AssetRegistry save moduleId so we don't have to do this here
-    const meta = AssetRegistry.getAssetByID(moduleId);
-    meta.moduleId = moduleId;
     const { uri, hash } = pickScale(meta);
 
     const asset = new Asset({
@@ -109,7 +128,7 @@ export default class Asset {
       width: meta.width,
       height: meta.height,
     });
-    Asset.byModule[moduleId] = asset;
+    Asset.byHash[metaHash] = asset;
     return asset;
   }
 
@@ -122,7 +141,6 @@ export default class Asset {
       return;
     }
     this.downloading = true;
-
     try {
       const localUri = `${FS.cacheDirectory}ExponentAsset-${this.hash}.${this.type}`;
       let exists, md5;
@@ -143,6 +161,7 @@ export default class Asset {
           );
         }
       }
+
       this.localUri = localUri;
       this.downloaded = true;
       this.downloadCallbacks.forEach(({ resolve }) => resolve());
@@ -158,9 +177,6 @@ export default class Asset {
 
 // Override React Native's asset resolution for `Image` components
 resolveAssetSource.setCustomSourceTransformer(resolver => {
-  if (!resolver.asset.moduleId) {
-    return resolver.fromSource(pickScale(resolver.asset).uri);
-  }
-  const asset = Asset.fromModule(resolver.asset.moduleId);
+  const asset = Asset.fromMetadata(resolver.asset);
   return resolver.fromSource(asset.downloaded ? asset.localUri : asset.uri);
 });

@@ -1,4 +1,4 @@
-/*! Raven.js 3.22.1 (eec289b) | github.com/getsentry/raven-js */
+/*! Raven.js 3.23.3 (f261ec2) | github.com/getsentry/raven-js */
 
 /*
  * Includes TraceKit
@@ -21,6 +21,8 @@ RavenConfigError.prototype.constructor = RavenConfigError;
 module.exports = RavenConfigError;
 
 },{}],2:[function(_dereq_,module,exports){
+var utils = _dereq_(5);
+
 var wrapMethod = function(console, level, callback) {
   var originalConsoleLevel = console[level];
   var originalConsole = console;
@@ -34,13 +36,14 @@ var wrapMethod = function(console, level, callback) {
   console[level] = function() {
     var args = [].slice.call(arguments);
 
-    var msg = '' + args.join(' ');
+    var msg = utils.safeJoin(args, ' ');
     var data = {level: sentryLevel, logger: 'console', extra: {arguments: args}};
 
     if (level === 'assert') {
       if (args[0] === false) {
         // Default browsers message
-        msg = 'Assertion failed: ' + (args.slice(1).join(' ') || 'console.assert');
+        msg =
+          'Assertion failed: ' + (utils.safeJoin(args.slice(1), ' ') || 'console.assert');
         data.extra.arguments = args.slice(1);
         callback && callback(msg, data);
       }
@@ -61,17 +64,19 @@ module.exports = {
   wrapMethod: wrapMethod
 };
 
-},{}],3:[function(_dereq_,module,exports){
+},{"5":5}],3:[function(_dereq_,module,exports){
 (function (global){
 /*global XDomainRequest:false */
 
 var TraceKit = _dereq_(6);
 var stringify = _dereq_(7);
+var md5 = _dereq_(8);
 var RavenConfigError = _dereq_(1);
 
 var utils = _dereq_(5);
 var isError = utils.isError;
 var isObject = utils.isObject;
+var isPlainObject = utils.isPlainObject;
 var isErrorEvent = utils.isErrorEvent;
 var isUndefined = utils.isUndefined;
 var isFunction = utils.isFunction;
@@ -92,6 +97,9 @@ var isSameStacktrace = utils.isSameStacktrace;
 var parseUrl = utils.parseUrl;
 var fill = utils.fill;
 var supportsFetch = utils.supportsFetch;
+var supportsReferrerPolicy = utils.supportsReferrerPolicy;
+var serializeKeysForMessage = utils.serializeKeysForMessage;
+var serializeException = utils.serializeException;
 
 var wrapConsoleMethod = _dereq_(2).wrapMethod;
 
@@ -143,6 +151,7 @@ function Raven() {
     includePaths: [],
     headers: null,
     collectWindowErrors: true,
+    captureUnhandledRejections: true,
     maxMessageLength: 0,
 
     // By default, truncates URL values to 250 chars
@@ -155,7 +164,11 @@ function Raven() {
   this._fetchDefaults = {
     method: 'POST',
     keepalive: true,
-    referrerPolicy: 'origin'
+    // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default
+    // https://caniuse.com/#feat=referrer-policy
+    // It doesn't. And it throw exception instead of ignoring this parameter...
+    // REF: https://github.com/getsentry/raven-js/issues/1233
+    referrerPolicy: supportsReferrerPolicy() ? 'origin' : ''
   };
   this._ignoreOnError = 0;
   this._isRavenInstalled = false;
@@ -191,7 +204,7 @@ Raven.prototype = {
   // webpack (using a build step causes webpack #1617). Grunt verifies that
   // this value matches package.json during build.
   //   See: https://github.com/getsentry/raven-js/issues/465
-  VERSION: '3.22.1',
+  VERSION: '3.23.3',
 
   debug: false,
 
@@ -296,6 +309,10 @@ Raven.prototype = {
       TraceKit.report.subscribe(function() {
         self._handleOnErrorStackInfo.apply(self, arguments);
       });
+
+      if (self._globalOptions.captureUnhandledRejections) {
+        self._attachPromiseRejectionHandler();
+      }
 
       self._patchFunctionToString();
 
@@ -447,16 +464,18 @@ Raven.prototype = {
     return wrapped;
   },
 
-  /*
-     * Uninstalls the global error handler.
-     *
-     * @return {Raven}
-     */
+  /**
+   * Uninstalls the global error handler.
+   *
+   * @return {Raven}
+   */
   uninstall: function() {
     TraceKit.report.uninstall();
 
+    this._detachPromiseRejectionHandler();
     this._unpatchFunctionToString();
     this._restoreBuiltIns();
+    this._restoreConsole();
 
     Error.stackTraceLimit = this._originalErrorStackTraceLimit;
     this._isRavenInstalled = false;
@@ -464,34 +483,78 @@ Raven.prototype = {
     return this;
   },
 
-  /*
-     * Manually capture an exception and send it over to Sentry
-     *
-     * @param {error} ex An exception to be logged
-     * @param {object} options A specific set of options for this error [optional]
-     * @return {Raven}
-     */
-  captureException: function(ex, options) {
-    // Cases for sending ex as a message, rather than an exception
-    var isNotError = !isError(ex);
-    var isNotErrorEvent = !isErrorEvent(ex);
-    var isErrorEventWithoutError = isErrorEvent(ex) && !ex.error;
+  /**
+   * Callback used for `unhandledrejection` event
+   *
+   * @param {PromiseRejectionEvent} event An object containing
+   *   promise: the Promise that was rejected
+   *   reason: the value with which the Promise was rejected
+   * @return void
+   */
+  _promiseRejectionHandler: function(event) {
+    this._logDebug('debug', 'Raven caught unhandled promise rejection:', event);
+    this.captureException(event.reason);
+  },
 
-    if ((isNotError && isNotErrorEvent) || isErrorEventWithoutError) {
+  /**
+   * Installs the global promise rejection handler.
+   *
+   * @return {raven}
+   */
+  _attachPromiseRejectionHandler: function() {
+    this._promiseRejectionHandler = this._promiseRejectionHandler.bind(this);
+    _window.addEventListener &&
+      _window.addEventListener('unhandledrejection', this._promiseRejectionHandler);
+    return this;
+  },
+
+  /**
+   * Uninstalls the global promise rejection handler.
+   *
+   * @return {raven}
+   */
+  _detachPromiseRejectionHandler: function() {
+    _window.removeEventListener &&
+      _window.removeEventListener('unhandledrejection', this._promiseRejectionHandler);
+    return this;
+  },
+
+  /**
+   * Manually capture an exception and send it over to Sentry
+   *
+   * @param {error} ex An exception to be logged
+   * @param {object} options A specific set of options for this error [optional]
+   * @return {Raven}
+   */
+  captureException: function(ex, options) {
+    options = objectMerge({trimHeadFrames: 0}, options ? options : {});
+
+    if (isErrorEvent(ex) && ex.error) {
+      // If it is an ErrorEvent with `error` property, extract it to get actual Error
+      ex = ex.error;
+    } else if (isError(ex)) {
+      // we have a real Error object
+      ex = ex;
+    } else if (isPlainObject(ex)) {
+      // If it is plain Object, serialize it manually and extract options
+      // This will allow us to group events based on top-level keys
+      // which is much better than creating new group when any key/value change
+      options = this._getCaptureExceptionOptionsFromPlainObject(options, ex);
+      ex = new Error(options.message);
+    } else {
+      // If none of previous checks were valid, then it means that
+      // it's not a plain Object
+      // it's not a valid ErrorEvent (one with an error property)
+      // it's not an Error
+      // So bail out and capture it as a simple message:
       return this.captureMessage(
         ex,
-        objectMerge(
-          {
-            trimHeadFrames: 1,
-            stacktrace: true // if we fall back to captureMessage, default to attempting a new trace
-          },
-          options
-        )
+        objectMerge(options, {
+          stacktrace: true, // if we fall back to captureMessage, default to attempting a new trace
+          trimHeadFrames: options.trimHeadFrames + 1
+        })
       );
     }
-
-    // Get actual Error from ErrorEvent
-    if (isErrorEvent(ex)) ex = ex.error;
 
     // Store the raw exception object for potential debugging and introspection
     this._lastCapturedException = ex;
@@ -513,6 +576,19 @@ Raven.prototype = {
     return this;
   },
 
+  _getCaptureExceptionOptionsFromPlainObject: function(currentOptions, ex) {
+    var exKeys = Object.keys(ex).sort();
+    var options = objectMerge(currentOptions, {
+      message:
+        'Non-Error exception captured with keys: ' + serializeKeysForMessage(exKeys),
+      fingerprint: [md5(exKeys)],
+      extra: currentOptions.extra || {}
+    });
+    options.extra.__serialized__ = serializeException(ex);
+
+    return options;
+  },
+
   /*
      * Manually send a message to Sentry
      *
@@ -532,10 +608,11 @@ Raven.prototype = {
     }
 
     options = options || {};
+    msg = msg + ''; // Make sure it's actually a string
 
     var data = objectMerge(
       {
-        message: msg + '' // Make sure it's actually a string
+        message: msg
       },
       options
     );
@@ -574,24 +651,33 @@ Raven.prototype = {
     }
 
     if (this._globalOptions.stacktrace || (options && options.stacktrace)) {
+      // fingerprint on msg, not stack trace (legacy behavior, could be revisited)
+      data.fingerprint = data.fingerprint == null ? msg : data.fingerprint;
+
       options = objectMerge(
         {
-          // fingerprint on msg, not stack trace (legacy behavior, could be
-          // revisited)
-          fingerprint: msg,
-          // since we know this is a synthetic trace, the top N-most frames
-          // MUST be from Raven.js, so mark them as in_app later by setting
-          // trimHeadFrames
-          trimHeadFrames: (options.trimHeadFrames || 0) + 1
+          trimHeadFrames: 0
         },
         options
       );
+      // Since we know this is a synthetic trace, the top frame (this function call)
+      // MUST be from Raven.js, so mark it for trimming
+      // We add to the trim counter so that callers can choose to trim extra frames, such
+      // as utility functions.
+      options.trimHeadFrames += 1;
 
       var frames = this._prepareFrames(stack, options);
       data.stacktrace = {
         // Sentry expects frames oldest to newest
         frames: frames.reverse()
       };
+    }
+
+    // Make sure that fingerprint is always wrapped in an array
+    if (data.fingerprint) {
+      data.fingerprint = isArray(data.fingerprint)
+        ? data.fingerprint
+        : [data.fingerprint];
     }
 
     // Fire away!
@@ -1448,6 +1534,13 @@ Raven.prototype = {
     }
   },
 
+  _restoreConsole: function() {
+    // eslint-disable-next-line guard-for-in
+    for (var method in this._originalConsoleMethods) {
+      this._originalConsole[method] = this._originalConsoleMethods[method];
+    }
+  },
+
   _drainPlugins: function() {
     var self = this;
 
@@ -2104,7 +2197,7 @@ Raven.prototype.setReleaseContext = Raven.prototype.setRelease;
 module.exports = Raven;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"1":1,"2":2,"5":5,"6":6,"7":7}],4:[function(_dereq_,module,exports){
+},{"1":1,"2":2,"5":5,"6":6,"7":7,"8":8}],4:[function(_dereq_,module,exports){
 (function (global){
 /**
  * Enforces a single instance of the Raven client, and the
@@ -2141,6 +2234,8 @@ module.exports = Raven;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"3":3}],5:[function(_dereq_,module,exports){
 (function (global){
+var stringify = _dereq_(7);
+
 var _window =
   typeof window !== 'undefined'
     ? window
@@ -2220,6 +2315,28 @@ function supportsFetch() {
   } catch (e) {
     return false;
   }
+}
+
+// Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default
+// https://caniuse.com/#feat=referrer-policy
+// It doesn't. And it throw exception instead of ignoring this parameter...
+// REF: https://github.com/getsentry/raven-js/issues/1233
+function supportsReferrerPolicy() {
+  if (!supportsFetch()) return false;
+
+  try {
+    // eslint-disable-next-line no-new
+    new Request('pickleRick', {
+      referrerPolicy: 'origin'
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function supportsPromiseRejectionEvent() {
+  return typeof PromiseRejectionEvent === 'function';
 }
 
 function wrappedCallback(callback) {
@@ -2540,6 +2657,120 @@ function fill(obj, name, replacement, track) {
   }
 }
 
+/**
+ * Join values in array
+ * @param input array of values to be joined together
+ * @param delimiter string to be placed in-between values
+ * @returns {string}
+ */
+function safeJoin(input, delimiter) {
+  if (!isArray(input)) return '';
+
+  var output = [];
+
+  for (var i = 0; i < input.length; i++) {
+    try {
+      output.push(String(input[i]));
+    } catch (e) {
+      output.push('[value cannot be serialized]');
+    }
+  }
+
+  return output.join(delimiter);
+}
+
+// Default Node.js REPL depth
+var MAX_SERIALIZE_EXCEPTION_DEPTH = 3;
+// 50kB, as 100kB is max payload size, so half sounds reasonable
+var MAX_SERIALIZE_EXCEPTION_SIZE = 50 * 1024;
+var MAX_SERIALIZE_KEYS_LENGTH = 40;
+
+function utf8Length(value) {
+  return ~-encodeURI(value).split(/%..|./).length;
+}
+
+function jsonSize(value) {
+  return utf8Length(JSON.stringify(value));
+}
+
+function serializeValue(value) {
+  var maxLength = 40;
+
+  if (typeof value === 'string') {
+    return value.length <= maxLength ? value : value.substr(0, maxLength - 1) + '\u2026';
+  } else if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    typeof value === 'undefined'
+  ) {
+    return value;
+  }
+
+  var type = Object.prototype.toString.call(value);
+
+  // Node.js REPL notation
+  if (type === '[object Object]') return '[Object]';
+  if (type === '[object Array]') return '[Array]';
+  if (type === '[object Function]')
+    return value.name ? '[Function: ' + value.name + ']' : '[Function]';
+
+  return value;
+}
+
+function serializeObject(value, depth) {
+  if (depth === 0) return serializeValue(value);
+
+  if (isPlainObject(value)) {
+    return Object.keys(value).reduce(function(acc, key) {
+      acc[key] = serializeObject(value[key], depth - 1);
+      return acc;
+    }, {});
+  } else if (Array.isArray(value)) {
+    return value.map(function(val) {
+      return serializeObject(val, depth - 1);
+    });
+  }
+
+  return serializeValue(value);
+}
+
+function serializeException(ex, depth, maxSize) {
+  if (!isPlainObject(ex)) return ex;
+
+  depth = typeof depth !== 'number' ? MAX_SERIALIZE_EXCEPTION_DEPTH : depth;
+  maxSize = typeof depth !== 'number' ? MAX_SERIALIZE_EXCEPTION_SIZE : maxSize;
+
+  var serialized = serializeObject(ex, depth);
+
+  if (jsonSize(stringify(serialized)) > maxSize) {
+    return serializeException(ex, depth - 1);
+  }
+
+  return serialized;
+}
+
+function serializeKeysForMessage(keys, maxLength) {
+  if (typeof keys === 'number' || typeof keys === 'string') return keys.toString();
+  if (!Array.isArray(keys)) return '';
+
+  keys = keys.filter(function(key) {
+    return typeof key === 'string';
+  });
+  if (keys.length === 0) return '[object has no keys]';
+
+  maxLength = typeof maxLength !== 'number' ? MAX_SERIALIZE_KEYS_LENGTH : maxLength;
+  if (keys[0].length >= maxLength) return keys[0];
+
+  for (var usedKeys = keys.length; usedKeys > 0; usedKeys--) {
+    var serialized = keys.slice(0, usedKeys).join(', ');
+    if (serialized.length > maxLength) continue;
+    if (usedKeys === keys.length) return serialized;
+    return serialized + '\u2026';
+  }
+
+  return '';
+}
+
 module.exports = {
   isObject: isObject,
   isError: isError,
@@ -2552,6 +2783,8 @@ module.exports = {
   isEmptyObject: isEmptyObject,
   supportsErrorEvent: supportsErrorEvent,
   supportsFetch: supportsFetch,
+  supportsReferrerPolicy: supportsReferrerPolicy,
+  supportsPromiseRejectionEvent: supportsPromiseRejectionEvent,
   wrappedCallback: wrappedCallback,
   each: each,
   objectMerge: objectMerge,
@@ -2566,11 +2799,14 @@ module.exports = {
   isSameException: isSameException,
   isSameStacktrace: isSameStacktrace,
   parseUrl: parseUrl,
-  fill: fill
+  fill: fill,
+  safeJoin: safeJoin,
+  serializeException: serializeException,
+  serializeKeysForMessage: serializeKeysForMessage
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(_dereq_,module,exports){
+},{"7":7}],6:[function(_dereq_,module,exports){
 (function (global){
 var utils = _dereq_(5);
 
@@ -2654,18 +2890,18 @@ TraceKit.report = (function reportModuleWrapper() {
     lastExceptionStack = null;
 
   /**
-     * Add a crash handler.
-     * @param {Function} handler
-     */
+   * Add a crash handler.
+   * @param {Function} handler
+   */
   function subscribe(handler) {
     installGlobalHandler();
     handlers.push(handler);
   }
 
   /**
-     * Remove a crash handler.
-     * @param {Function} handler
-     */
+   * Remove a crash handler.
+   * @param {Function} handler
+   */
   function unsubscribe(handler) {
     for (var i = handlers.length - 1; i >= 0; --i) {
       if (handlers[i] === handler) {
@@ -2675,17 +2911,17 @@ TraceKit.report = (function reportModuleWrapper() {
   }
 
   /**
-     * Remove all crash handlers.
-     */
+   * Remove all crash handlers.
+   */
   function unsubscribeAll() {
     uninstallGlobalHandler();
     handlers = [];
   }
 
   /**
-     * Dispatch stack information to all handlers.
-     * @param {Object.<string, *>} stack
-     */
+   * Dispatch stack information to all handlers.
+   * @param {Object.<string, *>} stack
+   */
   function notifyHandlers(stack, isWindowError) {
     var exception = null;
     if (isWindowError && !TraceKit.collectWindowErrors) {
@@ -2709,16 +2945,16 @@ TraceKit.report = (function reportModuleWrapper() {
   var _oldOnerrorHandler, _onErrorHandlerInstalled;
 
   /**
-     * Ensures all global unhandled exceptions are recorded.
-     * Supported by Gecko and IE.
-     * @param {string} msg Error message.
-     * @param {string} url URL of script that generated the exception.
-     * @param {(number|string)} lineNo The line number at which the error
-     * occurred.
-     * @param {?(number|string)} colNo The column number at which the error
-     * occurred.
-     * @param {?Error} ex The actual Error object.
-     */
+   * Ensures all global unhandled exceptions are recorded.
+   * Supported by Gecko and IE.
+   * @param {string} msg Error message.
+   * @param {string} url URL of script that generated the exception.
+   * @param {(number|string)} lineNo The line number at which the error
+   * occurred.
+   * @param {?(number|string)} colNo The column number at which the error
+   * occurred.
+   * @param {?Error} ex The actual Error object.
+   */
   function traceKitWindowOnError(msg, url, lineNo, colNo, ex) {
     var stack = null;
     // If 'ex' is ErrorEvent, get real Error from inside
@@ -2806,12 +3042,12 @@ TraceKit.report = (function reportModuleWrapper() {
   }
 
   /**
-     * Reports an unhandled Error to TraceKit.
-     * @param {Error} ex
-     * @param {?boolean} rethrow If false, do not re-throw the exception.
-     * Only used for window.onerror to not cause an infinite loop of
-     * rethrowing.
-     */
+   * Reports an unhandled Error to TraceKit.
+   * @param {Error} ex
+   * @param {?boolean} rethrow If false, do not re-throw the exception.
+   * Only used for window.onerror to not cause an infinite loop of
+   * rethrowing.
+   */
   function report(ex, rethrow) {
     var args = _slice.call(arguments, 1);
     if (lastExceptionStack) {
@@ -2938,26 +3174,28 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
   // ex.stacktrace = n/a; see 'opera:config#UserPrefs|Exceptions Have Stacktrace'
 
   /**
-     * Computes stack trace information from the stack property.
-     * Chrome and Gecko use this property.
-     * @param {Error} ex
-     * @return {?Object.<string, *>} Stack trace information.
-     */
+   * Computes stack trace information from the stack property.
+   * Chrome and Gecko use this property.
+   * @param {Error} ex
+   * @return {?Object.<string, *>} Stack trace information.
+   */
   function computeStackTraceFromStackProp(ex) {
     if (typeof ex.stack === 'undefined' || !ex.stack) return;
 
-    var chrome = /^\s*at (.*?) ?\(((?:file|https?|blob|chrome-extension|native|eval|webpack|<anonymous>|[a-z]:|\/).*?)(?::(\d+))?(?::(\d+))?\)?\s*$/i,
-      gecko = /^\s*(.*?)(?:\((.*?)\))?(?:^|@)((?:file|https?|blob|chrome|webpack|resource|\[native).*?|[^@]*bundle)(?::(\d+))?(?::(\d+))?\s*$/i,
-      winjs = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:file|ms-appx(?:-web)|https?|webpack|blob):.*?):(\d+)(?::(\d+))?\)?\s*$/i,
-      // Used to additionally parse URL/line/column from eval frames
-      geckoEval = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i,
-      chromeEval = /\((\S*)(?::(\d+))(?::(\d+))\)/,
-      lines = ex.stack.split('\n'),
-      stack = [],
-      submatch,
-      parts,
-      element,
-      reference = /^(.*) is undefined$/.exec(ex.message);
+    var chrome = /^\s*at (?:(.*?) ?\()?((?:file|https?|blob|chrome-extension|native|eval|webpack|<anonymous>|[a-z]:|\/).*?)(?::(\d+))?(?::(\d+))?\)?\s*$/i;
+    var winjs = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:file|ms-appx(?:-web)|https?|webpack|blob):.*?):(\d+)(?::(\d+))?\)?\s*$/i;
+    // NOTE: blob urls are now supposed to always have an origin, therefore it's format
+    // which is `blob:http://url/path/with-some-uuid`, is matched by `blob.*?:\/` as well
+    var gecko = /^\s*(.*?)(?:\((.*?)\))?(?:^|@)((?:file|https?|blob|chrome|webpack|resource|moz-extension).*?:\/.*?|\[native code\]|[^@]*bundle)(?::(\d+))?(?::(\d+))?\s*$/i;
+    // Used to additionally parse URL/line/column from eval frames
+    var geckoEval = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
+    var chromeEval = /\((\S*)(?::(\d+))(?::(\d+))\)/;
+    var lines = ex.stack.split('\n');
+    var stack = [];
+    var submatch;
+    var parts;
+    var element;
+    var reference = /^(.*) is undefined$/.exec(ex.message);
 
     for (var i = 0, j = lines.length; i < j; ++i) {
       if ((parts = chrome.exec(lines[i]))) {
@@ -3029,18 +3267,18 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
   }
 
   /**
-     * Adds information about the first frame to incomplete stack traces.
-     * Safari and IE require this to get complete data on the first frame.
-     * @param {Object.<string, *>} stackInfo Stack trace information from
-     * one of the compute* methods.
-     * @param {string} url The URL of the script that caused an error.
-     * @param {(number|string)} lineNo The line number of the script that
-     * caused an error.
-     * @param {string=} message The error generated by the browser, which
-     * hopefully contains the name of the object that caused the error.
-     * @return {boolean} Whether or not the stack information was
-     * augmented.
-     */
+   * Adds information about the first frame to incomplete stack traces.
+   * Safari and IE require this to get complete data on the first frame.
+   * @param {Object.<string, *>} stackInfo Stack trace information from
+   * one of the compute* methods.
+   * @param {string} url The URL of the script that caused an error.
+   * @param {(number|string)} lineNo The line number of the script that
+   * caused an error.
+   * @param {string=} message The error generated by the browser, which
+   * hopefully contains the name of the object that caused the error.
+   * @return {boolean} Whether or not the stack information was
+   * augmented.
+   */
   function augmentStackTraceWithInitialElement(stackInfo, url, lineNo, message) {
     var initial = {
       url: url,
@@ -3079,14 +3317,14 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
   }
 
   /**
-     * Computes stack trace information by walking the arguments.caller
-     * chain at the time the exception occurred. This will cause earlier
-     * frames to be missed but is the only way to get any stack trace in
-     * Safari and IE. The top frame is restored by
-     * {@link augmentStackTraceWithInitialElement}.
-     * @param {Error} ex
-     * @return {?Object.<string, *>} Stack trace information.
-     */
+   * Computes stack trace information by walking the arguments.caller
+   * chain at the time the exception occurred. This will cause earlier
+   * frames to be missed but is the only way to get any stack trace in
+   * Safari and IE. The top frame is restored by
+   * {@link augmentStackTraceWithInitialElement}.
+   * @param {Error} ex
+   * @return {?Object.<string, *>} Stack trace information.
+   */
   function computeStackTraceByWalkingCallerChain(ex, depth) {
     var functionName = /function\s+([_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*)?\s*\(/i,
       stack = [],
@@ -3156,10 +3394,10 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
   }
 
   /**
-     * Computes a stack trace for an exception.
-     * @param {Error} ex
-     * @param {(string|number)=} depth
-     */
+   * Computes a stack trace for an exception.
+   * @param {Error} ex
+   * @param {(string|number)=} depth
+   */
   function computeStackTrace(ex, depth) {
     var stack = null;
     depth = depth == null ? 0 : +depth;
@@ -3276,6 +3514,274 @@ function serializer(replacer, cycleReplacer) {
       : replacer.call(this, key, value);
   };
 }
+
+},{}],8:[function(_dereq_,module,exports){
+/*
+ * JavaScript MD5
+ * https://github.com/blueimp/JavaScript-MD5
+ *
+ * Copyright 2011, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * https://opensource.org/licenses/MIT
+ *
+ * Based on
+ * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
+ * Digest Algorithm, as defined in RFC 1321.
+ * Version 2.2 Copyright (C) Paul Johnston 1999 - 2009
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for more info.
+ */
+
+/*
+* Add integers, wrapping at 2^32. This uses 16-bit operations internally
+* to work around bugs in some JS interpreters.
+*/
+function safeAdd(x, y) {
+  var lsw = (x & 0xffff) + (y & 0xffff);
+  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+  return (msw << 16) | (lsw & 0xffff);
+}
+
+/*
+* Bitwise rotate a 32-bit number to the left.
+*/
+function bitRotateLeft(num, cnt) {
+  return (num << cnt) | (num >>> (32 - cnt));
+}
+
+/*
+* These functions implement the four basic operations the algorithm uses.
+*/
+function md5cmn(q, a, b, x, s, t) {
+  return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
+}
+function md5ff(a, b, c, d, x, s, t) {
+  return md5cmn((b & c) | (~b & d), a, b, x, s, t);
+}
+function md5gg(a, b, c, d, x, s, t) {
+  return md5cmn((b & d) | (c & ~d), a, b, x, s, t);
+}
+function md5hh(a, b, c, d, x, s, t) {
+  return md5cmn(b ^ c ^ d, a, b, x, s, t);
+}
+function md5ii(a, b, c, d, x, s, t) {
+  return md5cmn(c ^ (b | ~d), a, b, x, s, t);
+}
+
+/*
+* Calculate the MD5 of an array of little-endian words, and a bit length.
+*/
+function binlMD5(x, len) {
+  /* append padding */
+  x[len >> 5] |= 0x80 << (len % 32);
+  x[(((len + 64) >>> 9) << 4) + 14] = len;
+
+  var i;
+  var olda;
+  var oldb;
+  var oldc;
+  var oldd;
+  var a = 1732584193;
+  var b = -271733879;
+  var c = -1732584194;
+  var d = 271733878;
+
+  for (i = 0; i < x.length; i += 16) {
+    olda = a;
+    oldb = b;
+    oldc = c;
+    oldd = d;
+
+    a = md5ff(a, b, c, d, x[i], 7, -680876936);
+    d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
+    c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
+    b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
+    a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
+    d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
+    c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
+    b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
+    a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
+    d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
+    c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
+    b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
+    a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
+    d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
+    c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
+    b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
+
+    a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
+    d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
+    c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
+    b = md5gg(b, c, d, a, x[i], 20, -373897302);
+    a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
+    d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
+    c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
+    b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
+    a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
+    d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
+    c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
+    b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
+    a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
+    d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
+    c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
+    b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
+
+    a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
+    d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
+    c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
+    b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
+    a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
+    d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
+    c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
+    b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
+    a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
+    d = md5hh(d, a, b, c, x[i], 11, -358537222);
+    c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
+    b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
+    a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
+    d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
+    c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
+    b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
+
+    a = md5ii(a, b, c, d, x[i], 6, -198630844);
+    d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
+    c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
+    b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
+    a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
+    d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
+    c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
+    b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
+    a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
+    d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
+    c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
+    b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
+    a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
+    d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
+    c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
+    b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
+
+    a = safeAdd(a, olda);
+    b = safeAdd(b, oldb);
+    c = safeAdd(c, oldc);
+    d = safeAdd(d, oldd);
+  }
+  return [a, b, c, d];
+}
+
+/*
+* Convert an array of little-endian words to a string
+*/
+function binl2rstr(input) {
+  var i;
+  var output = '';
+  var length32 = input.length * 32;
+  for (i = 0; i < length32; i += 8) {
+    output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xff);
+  }
+  return output;
+}
+
+/*
+* Convert a raw string to an array of little-endian words
+* Characters >255 have their high-byte silently ignored.
+*/
+function rstr2binl(input) {
+  var i;
+  var output = [];
+  output[(input.length >> 2) - 1] = undefined;
+  for (i = 0; i < output.length; i += 1) {
+    output[i] = 0;
+  }
+  var length8 = input.length * 8;
+  for (i = 0; i < length8; i += 8) {
+    output[i >> 5] |= (input.charCodeAt(i / 8) & 0xff) << (i % 32);
+  }
+  return output;
+}
+
+/*
+* Calculate the MD5 of a raw string
+*/
+function rstrMD5(s) {
+  return binl2rstr(binlMD5(rstr2binl(s), s.length * 8));
+}
+
+/*
+* Calculate the HMAC-MD5, of a key and some data (raw strings)
+*/
+function rstrHMACMD5(key, data) {
+  var i;
+  var bkey = rstr2binl(key);
+  var ipad = [];
+  var opad = [];
+  var hash;
+  ipad[15] = opad[15] = undefined;
+  if (bkey.length > 16) {
+    bkey = binlMD5(bkey, key.length * 8);
+  }
+  for (i = 0; i < 16; i += 1) {
+    ipad[i] = bkey[i] ^ 0x36363636;
+    opad[i] = bkey[i] ^ 0x5c5c5c5c;
+  }
+  hash = binlMD5(ipad.concat(rstr2binl(data)), 512 + data.length * 8);
+  return binl2rstr(binlMD5(opad.concat(hash), 512 + 128));
+}
+
+/*
+* Convert a raw string to a hex string
+*/
+function rstr2hex(input) {
+  var hexTab = '0123456789abcdef';
+  var output = '';
+  var x;
+  var i;
+  for (i = 0; i < input.length; i += 1) {
+    x = input.charCodeAt(i);
+    output += hexTab.charAt((x >>> 4) & 0x0f) + hexTab.charAt(x & 0x0f);
+  }
+  return output;
+}
+
+/*
+* Encode a string as utf-8
+*/
+function str2rstrUTF8(input) {
+  return unescape(encodeURIComponent(input));
+}
+
+/*
+* Take string arguments and return either raw or hex encoded strings
+*/
+function rawMD5(s) {
+  return rstrMD5(str2rstrUTF8(s));
+}
+function hexMD5(s) {
+  return rstr2hex(rawMD5(s));
+}
+function rawHMACMD5(k, d) {
+  return rstrHMACMD5(str2rstrUTF8(k), str2rstrUTF8(d));
+}
+function hexHMACMD5(k, d) {
+  return rstr2hex(rawHMACMD5(k, d));
+}
+
+function md5(string, key, raw) {
+  if (!key) {
+    if (!raw) {
+      return hexMD5(string);
+    }
+    return rawMD5(string);
+  }
+  if (!raw) {
+    return hexHMACMD5(key, string);
+  }
+  return rawHMACMD5(key, string);
+}
+
+module.exports = md5;
 
 },{}]},{},[4])(4)
 });

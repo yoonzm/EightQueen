@@ -29,11 +29,15 @@ function wrapWithExpoRoot<P: InitialProps>(AppRootComponent: ComponentType<P>): 
     }
 
     render() {
-      return (
-        <RootErrorBoundary>
-          <AppRootComponent {...this.props} />
-        </RootErrorBoundary>
-      );
+      if (__DEV__) {
+        return (
+          <RootErrorBoundary>
+            <AppRootComponent {...this.props} />
+          </RootErrorBoundary>
+        );
+      } else {
+        return <AppRootComponent {...this.props} />;
+      }
     }
   };
 }

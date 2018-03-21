@@ -61,13 +61,18 @@ export default class GLView extends React.Component<Props> {
       ...viewProps
     } = this.props;
 
-    // NOTE: Removing `backgroundColor: 'transparent'` causes a performance regression. Not sure why
-    //       yet...
     return (
       <View {...viewProps}>
         <GLView.NativeView
           ref={this._setNativeRef}
-          style={{ flex: 1, backgroundColor: 'transparent' }}
+          style={{
+            flex: 1,
+            ...(Platform.OS === 'ios'
+              ? {
+                  backgroundColor: 'transparent',
+                }
+              : {}),
+          }}
           onSurfaceCreate={this._onSurfaceCreate}
           msaaSamples={Platform.OS === 'ios' ? msaaSamples : undefined}
         />

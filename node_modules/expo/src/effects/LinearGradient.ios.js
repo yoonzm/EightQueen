@@ -33,8 +33,8 @@ export default class LinearGradient extends Component {
         {...otherProps}
         colors={colors.map(processColor)}
         locations={locations ? locations.slice(0, colors.length) : null}
-        start={startProp}
-        end={endProp}
+        startPoint={startProp}
+        endPoint={endProp}
       />
     );
   }

@@ -2,6 +2,9 @@
 
 A [Jest](https://facebook.github.io/jest/) preset to painlessly test your Expo apps.
 
+If you have problems with the code in this repository, please file issues & bug reports
+at https://github.com/expo/expo. Thanks!
+
 ### Installation
 
 - `yarn add jest-expo --dev` or `npm i jest-expo --save-dev`

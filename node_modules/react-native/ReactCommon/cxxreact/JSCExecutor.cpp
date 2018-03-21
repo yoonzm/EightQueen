@@ -19,9 +19,9 @@
 #include <folly/Memory.h>
 #include <folly/String.h>
 #include <glog/logging.h>
-#include <jschelpers/InspectorInterfaces.h>
 #include <jschelpers/JSCHelpers.h>
 #include <jschelpers/Value.h>
+#include <jsinspector/InspectorInterfaces.h>
 
 #include "JSBigString.h"
 #include "JSBundleType.h"
@@ -215,11 +215,12 @@ namespace facebook {
         const std::string ownerId = m_jscConfig.getDefault("OwnerIdentity", "unknown").getString();
         const std::string appId = m_jscConfig.getDefault("AppIdentity", "unknown").getString();
         const std::string deviceId = m_jscConfig.getDefault("DeviceIdentity", "unknown").getString();
-        const std::function<bool()> checkIsInspectedRemote = [&](){
+        auto checkIsInspectedRemote = [ownerId, appId, deviceId]() {
           return isNetworkInspected(ownerId, appId, deviceId);
         };
-        IInspector* pInspector = JSC_JSInspectorGetInstance(true);
-        pInspector->registerGlobalContext(ownerId, checkIsInspectedRemote, m_context);
+
+        auto& globalInspector = facebook::react::getInspectorInstance();
+        JSC_JSGlobalContextEnableDebugger(m_context, globalInspector, ownerId.c_str(), checkIsInspectedRemote);
       }
 
       installNativeHook<&JSCExecutor::nativeFlushQueueImmediate>("nativeFlushQueueImmediate");
@@ -340,8 +341,8 @@ namespace facebook {
       m_nativeModules.reset();
 
       if (canUseInspector(context)) {
-        IInspector* pInspector = JSC_JSInspectorGetInstance(true);
-        pInspector->unregisterGlobalContext(context);
+        auto &globalInspector = facebook::react::getInspectorInstance();
+        JSC_JSGlobalContextDisableDebugger(context, globalInspector);
       }
 
       JSC_JSGlobalContextRelease(context);
@@ -456,6 +457,12 @@ namespace facebook {
         installNativeHook<&JSCExecutor::nativeRequire>("nativeRequire");
       }
       m_bundleRegistry = std::move(bundleRegistry);
+    }
+
+    void JSCExecutor::registerBundle(uint32_t bundleId, const std::string& bundlePath) {
+      if (m_bundleRegistry) {
+        m_bundleRegistry->registerBundle(bundleId, bundlePath);
+      }
     }
 
     void JSCExecutor::bindBridge() throw(JSException) {
@@ -651,7 +658,7 @@ namespace facebook {
     void JSCExecutor::loadModule(uint32_t bundleId, uint32_t moduleId) {
       auto module = m_bundleRegistry->getModule(bundleId, moduleId);
       auto sourceUrl = String::createExpectingAscii(m_context, module.name);
-      auto source = String::createExpectingAscii(m_context, module.code);
+      auto source = adoptString(std::unique_ptr<JSBigString>(new JSBigStdString(module.code)));
       evaluateScript(m_context, source, sourceUrl);
     }
 

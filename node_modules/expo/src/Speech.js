@@ -1,6 +1,6 @@
 // @flow
 
-import { NativeModules, NativeEventEmitter } from 'react-native';
+import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { ExponentSpeech } = NativeModules;
 const SpeechEventEmitter = new NativeEventEmitter(ExponentSpeech);
@@ -78,6 +78,22 @@ export async function isSpeakingAsync(): Promise<boolean> {
 
 export function stop() {
   ExponentSpeech.stop();
+}
+
+export function pause() {
+  if (Platform.OS === 'ios') {
+    ExponentSpeech.pause();
+  } else {
+    throw new Error('Speech.pause is not available on Android');
+  }
+}
+
+export function resume() {
+  if (Platform.OS === 'ios') {
+    ExponentSpeech.resume();
+  } else {
+    throw new Error('Speech.resume is not available on Android');
+  }
 }
 
 function setSpeakingListener(eventName, callback) {
