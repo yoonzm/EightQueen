@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "25.0.0"
+    "sdkVersion": "25.0.0",
+    "name": "eightQueen",
+    "icon": "https://s3.amazonaws.com/exp-us-standard/rnplay/app-icon.png",
+    "version": "2.0.0",
+    "slug": "eightQueen",
+    "ios": {
+      "bundleIdentifier": "com.eightQueen"
+    },
+    "android": {
+      "package": "com.eightQueen"
+    }
   }
 }
