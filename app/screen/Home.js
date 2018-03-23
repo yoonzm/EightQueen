@@ -6,7 +6,7 @@
  * Desc:
  */
 import React, {Component} from "react";
-import {ActivityIndicator, FlatList, StyleSheet, Text, Keyboard, InteractionManager, View} from "react-native";
+import {ActivityIndicator, FlatList, StyleSheet, Text, Keyboard, InteractionManager, View, Alert} from "react-native";
 import QueenItem from "./QueenItem";
 import {Button, FormInput, Icon} from "react-native-elements";
 import {queenResult} from "../utils/index";
@@ -24,15 +24,35 @@ export class Home extends Component {
     };
   }
 
-  go() {
-    Keyboard.dismiss();
+  confirmGo(number) {
     this.setState({loading: true});
     InteractionManager.runAfterInteractions(() => {
       // ...耗时较长的同步的任务...
-      const number = Number(this.state.length)
       const data = queenResult(number);
       this.setState({data, loading: false, result: true});
     });
+  }
+
+  go() {
+    Keyboard.dismiss();
+    const number = Number(this.state.length);
+    if (number <= 12) {
+      this.confirmGo(number);
+      return;
+    }
+    Alert.alert(
+      '警告',
+      '皇后数大于12后结果将超过14200种,确定继续吗?',
+      [
+        {
+          text: '取消'
+        },
+        {
+          text: '确定', onPress: () => this.confirmGo(number)
+        },
+      ]
+    )
+
   }
 
   render() {
@@ -45,6 +65,7 @@ export class Home extends Component {
           placeholder='请输入皇后个数...'
           onChangeText={length => this.setState({length, data: [], result: false})}
           keyboardType={'number-pad'}
+          maxLength={2}
         />
 
         <Icon

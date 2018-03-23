@@ -2,125 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="60155132-caf6-48ef-abfc-c9462dc50cbd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/assets/images/empty-data.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/component/EmptyDataComponent.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/screen/CheckerBoard.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/screen/CheckerBoardItem.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/screen/Detail.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/screen/Home.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/screen/QueenItem.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/utils/index.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/.npmignore" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/package.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/path.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/runtime-module.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/node_modules/regenerator-runtime/runtime.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/package-lock.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/xdl/node_modules/opn/index.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/xdl/node_modules/opn/license" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/xdl/node_modules/opn/package.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/xdl/node_modules/opn/readme.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/node_modules/xdl/node_modules/opn/xdg-open" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/router/routes.js" afterPath="$PROJECT_DIR$/app/router/routes.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/screen/index.js" afterPath="$PROJECT_DIR$/app/screen/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/.yarn-integrity" afterPath="$PROJECT_DIR$/node_modules/.yarn-integrity" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-jest/package.json" afterPath="$PROJECT_DIR$/node_modules/babel-jest/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-plugin-jest-hoist/package.json" afterPath="$PROJECT_DIR$/node_modules/babel-plugin-jest-hoist/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/browser.js" afterPath="$PROJECT_DIR$/node_modules/babel-polyfill/browser.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/dist/polyfill.js" afterPath="$PROJECT_DIR$/node_modules/babel-polyfill/dist/polyfill.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/dist/polyfill.min.js" afterPath="$PROJECT_DIR$/node_modules/babel-polyfill/dist/polyfill.min.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-polyfill/package.json" afterPath="$PROJECT_DIR$/node_modules/babel-polyfill/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/babel-preset-jest/package.json" afterPath="$PROJECT_DIR$/node_modules/babel-preset-jest/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/clone/README.md" afterPath="$PROJECT_DIR$/node_modules/clone/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/clone/clone.js" afterPath="$PROJECT_DIR$/node_modules/clone/clone.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/clone/package.json" afterPath="$PROJECT_DIR$/node_modules/clone/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/concat-stream/index.js" afterPath="$PROJECT_DIR$/node_modules/concat-stream/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/concat-stream/package.json" afterPath="$PROJECT_DIR$/node_modules/concat-stream/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/concat-stream/readme.md" afterPath="$PROJECT_DIR$/node_modules/concat-stream/readme.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/.eslintrc" afterPath="$PROJECT_DIR$/node_modules/es-abstract/.eslintrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/.jscs.json" afterPath="$PROJECT_DIR$/node_modules/es-abstract/.jscs.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/.travis.yml" afterPath="$PROJECT_DIR$/node_modules/es-abstract/.travis.yml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/CHANGELOG.md" afterPath="$PROJECT_DIR$/node_modules/es-abstract/CHANGELOG.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/es2015.js" afterPath="$PROJECT_DIR$/node_modules/es-abstract/es2015.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/package.json" afterPath="$PROJECT_DIR$/node_modules/es-abstract/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/test/es2015.js" afterPath="$PROJECT_DIR$/node_modules/es-abstract/test/es2015.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/test/es2016.js" afterPath="$PROJECT_DIR$/node_modules/es-abstract/test/es2016.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/test/es2017.js" afterPath="$PROJECT_DIR$/node_modules/es-abstract/test/es2017.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/es-abstract/test/tests.js" afterPath="$PROJECT_DIR$/node_modules/es-abstract/test/tests.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build-es5/index.js" afterPath="$PROJECT_DIR$/node_modules/expect/build-es5/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/asymmetric_matchers.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/asymmetric_matchers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/extract_expected_assertions_errors.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/extract_expected_assertions_errors.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/fake_chalk.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/fake_chalk.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/index.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/jasmine_utils.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/jasmine_utils.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/jest_matchers_object.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/jest_matchers_object.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/matchers.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/matchers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/spy_matchers.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/spy_matchers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/to_throw_matchers.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/to_throw_matchers.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/build/utils.js" afterPath="$PROJECT_DIR$/node_modules/expect/build/utils.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/expect/package.json" afterPath="$PROJECT_DIR$/node_modules/expect/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-changed-files/build/git.js" afterPath="$PROJECT_DIR$/node_modules/jest-changed-files/build/git.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-changed-files/build/hg.js" afterPath="$PROJECT_DIR$/node_modules/jest-changed-files/build/hg.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-changed-files/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-changed-files/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-changed-files/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-changed-files/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-cli/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-cli/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-config/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-config/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-diff/build/constants.js" afterPath="$PROJECT_DIR$/node_modules/jest-diff/build/constants.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-diff/build/diff_strings.js" afterPath="$PROJECT_DIR$/node_modules/jest-diff/build/diff_strings.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-diff/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-diff/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-diff/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-diff/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-docblock/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-docblock/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-docblock/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-docblock/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-environment-jsdom/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-environment-jsdom/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-environment-node/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-environment-node/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-get-type/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-get-type/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-get-type/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-get-type/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-haste-map/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-haste-map/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-jasmine2/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-jasmine2/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-matcher-utils/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-matcher-utils/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-matcher-utils/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-matcher-utils/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-message-util/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-message-util/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-message-util/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-message-util/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-mock/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-mock/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-mock/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-mock/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-regex-util/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-regex-util/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-regex-util/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-regex-util/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-resolve-dependencies/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-resolve-dependencies/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-resolve-dependencies/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-resolve-dependencies/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-resolve/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-resolve/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-runner/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-runner/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-runtime/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-runtime/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-snapshot/build/State.js" afterPath="$PROJECT_DIR$/node_modules/jest-snapshot/build/State.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-snapshot/build/index.js" afterPath="$PROJECT_DIR$/node_modules/jest-snapshot/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-snapshot/build/plugins.js" afterPath="$PROJECT_DIR$/node_modules/jest-snapshot/build/plugins.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-snapshot/build/utils.js" afterPath="$PROJECT_DIR$/node_modules/jest-snapshot/build/utils.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-snapshot/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-snapshot/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-util/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-util/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest-validate/package.json" afterPath="$PROJECT_DIR$/node_modules/jest-validate/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/jest/package.json" afterPath="$PROJECT_DIR$/node_modules/jest/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/opn/index.js" afterPath="$PROJECT_DIR$/node_modules/opn/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/opn/package.json" afterPath="$PROJECT_DIR$/node_modules/opn/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/opn/readme.md" afterPath="$PROJECT_DIR$/node_modules/opn/readme.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/collections.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/collections.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/index.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/asymmetric_matcher.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/asymmetric_matcher.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/convert_ansi.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/convert_ansi.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/dom_element.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/dom_element.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/immutable.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/immutable.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/lib/escape_html.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/lib/escape_html.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/lib/markup.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/lib/markup.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/react_element.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/react_element.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/react_test_component.js" afterPath="$PROJECT_DIR$/node_modules/pretty-format/build/plugins/react_test_component.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/pretty-format/package.json" afterPath="$PROJECT_DIR$/node_modules/pretty-format/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/regenerator-runtime/package.json" afterPath="$PROJECT_DIR$/node_modules/regenerator-runtime/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/regenerator-runtime/path.js" afterPath="$PROJECT_DIR$/node_modules/regenerator-runtime/path.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/regenerator-runtime/runtime-module.js" afterPath="$PROJECT_DIR$/node_modules/regenerator-runtime/runtime-module.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/regenerator-runtime/runtime.js" afterPath="$PROJECT_DIR$/node_modules/regenerator-runtime/runtime.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/vinyl/node_modules/clone/clone.js" afterPath="$PROJECT_DIR$/node_modules/vinyl/node_modules/clone/clone.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_modules/vinyl/node_modules/clone/package.json" afterPath="$PROJECT_DIR$/node_modules/vinyl/node_modules/clone/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/screen/Home.js" afterPath="$PROJECT_DIR$/app/screen/Home.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -135,11 +17,35 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="QueenItem.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CheckerBoard.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoard.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="489">
+              <caret line="34" column="8" lean-forward="true" selection-start-line="34" selection-start-column="8" selection-end-line="34" selection-end-column="8" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QueenItem.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/screen/QueenItem.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="500">
-              <caret line="25" column="4" lean-forward="false" selection-start-line="25" selection-start-column="4" selection-end-line="25" selection-end-column="4" />
+            <state relative-caret-position="360">
+              <caret line="30" column="12" lean-forward="true" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="12" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Home.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/screen/Home.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="560">
+              <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -148,96 +54,10 @@
         </entry>
       </file>
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/utils/index.js">
+        <entry file="file://$PROJECT_DIR$/app/screen/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="42" column="18" lean-forward="false" selection-start-line="42" selection-start-column="18" selection-end-line="42" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="prop-types.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/react-native/flow/prop-types.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="22" column="26" lean-forward="false" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CheckerBoard.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoard.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="25" column="29" lean-forward="false" selection-start-line="25" selection-start-column="29" selection-end-line="25" selection-end-column="29" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CheckerBoardItem.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoardItem.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Home.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/screen/Home.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="112" column="13" lean-forward="false" selection-start-line="112" selection-start-column="13" selection-end-line="112" selection-end-column="13" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EmptyDataComponent.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/component/EmptyDataComponent.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="26" column="4" lean-forward="true" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Detail.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/screen/Detail.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
-              <caret line="10" column="7" lean-forward="false" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.d.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/react-native-modal/src/index.d.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="19" column="23" lean-forward="false" selection-start-line="19" selection-start-column="23" selection-end-line="19" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.d.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/react-native-elements/src/index.d.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="389" column="13" lean-forward="false" selection-start-line="389" selection-start-column="13" selection-end-line="389" selection-end-column="13" />
+            <state relative-caret-position="60">
+              <caret line="9" column="21" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -283,8 +103,8 @@
         <option value="$PROJECT_DIR$/app/screen/CheckerBoardItem.js" />
         <option value="$PROJECT_DIR$/app/utils/index.js" />
         <option value="$PROJECT_DIR$/app/component/EmptyDataComponent.js" />
-        <option value="$PROJECT_DIR$/app/screen/Home.js" />
         <option value="$PROJECT_DIR$/app/screen/QueenItem.js" />
+        <option value="$PROJECT_DIR$/app/screen/Home.js" />
       </list>
     </option>
   </component>
@@ -352,10 +172,6 @@
               <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="utils" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -372,20 +188,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="screen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eightQueen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="eightQueen" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -520,12 +322,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1521627449058</updated>
-      <workItem from="1521627450184" duration="20741000" />
+      <workItem from="1521627450184" duration="22004000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20741000" />
+    <option name="totallyTimeSpent" value="22004000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="-4" width="1920" height="1021" extended-state="6" />
@@ -751,14 +553,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/screen/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="9" column="21" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/react-native-elements/src/buttons/Button.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -815,26 +609,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoard.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="25" column="29" lean-forward="false" selection-start-line="25" selection-start-column="29" selection-end-line="25" selection-end-column="29" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/screen/Home.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="112" column="13" lean-forward="false" selection-start-line="112" selection-start-column="13" selection-end-line="112" selection-end-column="13" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoardItem.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -845,10 +619,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/screen/CheckerBoard.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="489">
+          <caret line="34" column="8" lean-forward="true" selection-start-line="34" selection-start-column="8" selection-end-line="34" selection-end-column="8" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/screen/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="9" column="21" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/screen/QueenItem.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="500">
-          <caret line="25" column="4" lean-forward="false" selection-start-line="25" selection-start-column="4" selection-end-line="25" selection-end-column="4" />
+        <state relative-caret-position="360">
+          <caret line="30" column="12" lean-forward="true" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="12" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/screen/Home.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
