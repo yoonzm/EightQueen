@@ -6,7 +6,7 @@
  * Desc:
  */
 import React, {Component} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, TouchableWithoutFeedback, View} from "react-native";
 import PropTypes from "prop-types";
 import CheckerBoard from "./CheckerBoard";
 
@@ -14,6 +14,7 @@ export default class QueenItem extends Component {
   static propTypes = {
     item: PropTypes.array.isRequired,
     index: PropTypes.number.isRequired,
+    navigation: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -21,16 +22,22 @@ export default class QueenItem extends Component {
     this.state = {};
   }
 
+  navToDetail(data) {
+    this.props.navigation.navigate('Detail', {data});
+  }
+
   render() {
     const {item, index} = this.props;
 
     return (
-      <View>
-        <View style={styles.itemTitle}>
-          <Text style={{color: '#fff'}}>第{index + 1}种结果</Text>
+      <TouchableWithoutFeedback onPress={this.navToDetail.bind(this, item)}>
+        <View>
+          <View style={styles.itemTitle}>
+            <Text style={{color: '#fff'}}>第{index + 1}种结果</Text>
+          </View>
+          <CheckerBoard data={item}/>
         </View>
-        <CheckerBoard data={item}/>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

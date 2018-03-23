@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import "./app/assets/Color";
+import "./app/utils/global";
 import AppRouter from "./app/router/routesBuilder";
 
 export default class App extends React.Component {

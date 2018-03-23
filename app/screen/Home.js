@@ -36,6 +36,13 @@ export class Home extends Component {
   go() {
     Keyboard.dismiss();
     const number = Number(this.state.length);
+    if (!number) {
+      Alert.alert(
+        '警告',
+        '不能为空或零.',
+      );
+      return;
+    }
     if (number <= 12) {
       this.confirmGo(number);
       return;
@@ -70,7 +77,7 @@ export class Home extends Component {
 
         <Icon
           raised
-          name='call'
+          name='my-location'
           size={20}
           color={Color.mainColor}
           onPress={this.go.bind(this)}
@@ -87,7 +94,11 @@ export class Home extends Component {
     const list = (
       <FlatList
         data={this.state.data}
-        renderItem={({item, index}) => <QueenItem item={item} index={index}/>}
+        renderItem={({item, index}) => (
+          <QueenItem item={item} index={index}
+                     navigation={this.props.navigation}
+          />
+        )}
         ItemSeparatorComponent={_ => <View style={styles.separator}/>}
         keyExtractor={(item, index) => index}
         ListEmptyComponent={<EmptyDataComponent/>}

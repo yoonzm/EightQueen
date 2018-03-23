@@ -8,6 +8,7 @@
 import React, {Component} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import PropTypes from "prop-types";
+import {Icon} from "react-native-elements";
 
 export default class CheckerBoardItem extends Component {
   static propTypes = {
@@ -28,10 +29,11 @@ export default class CheckerBoardItem extends Component {
 
     return (
       <View style={[styles.container, {backgroundColor}]}>
-        {active && <View style={[
-          styles.queenActive,
-          {backgroundColor: backgroundColor === '#fff' ? '#000' : '#fff'}
-        ]}/>}
+        {active && <Icon
+          name='spa'
+          size={25}
+          color={backgroundColor === '#fff' ? '#000' : '#fff'}
+        />}
       </View>
     );
   }

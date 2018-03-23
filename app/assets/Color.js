@@ -5,8 +5,8 @@
  * Time: 上午9:29
  * Desc:
  */
-const Color = {
-    mainColor: '#003a66'
+export const Color = {
+  mainColor: '#003a66',
+  disabledColor: '#b5b5b5',
 }
 
-global.Color = Color;
