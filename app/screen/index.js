@@ -6,3 +6,5 @@
  * Desc:
  */
 export * from "./Test";
+export * from "./Home";
+export * from "./Detail";
