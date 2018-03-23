@@ -80,7 +80,9 @@ export class Detail extends Component {
 
     return (
       <View style={styles.container}>
-        <CheckerBoard data={stepMode ? stepData : data}/>
+        <CheckerBoard data={stepMode ? stepData : data}
+                      isStepMode={stepMode}
+        />
         <View style={styles.stepSwitch}>
           <Text>
             演示模式

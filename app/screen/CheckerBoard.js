@@ -13,7 +13,8 @@ import CheckerBoardItem from "./CheckerBoardItem";
 
 export default class CheckerBoard extends Component {
   static propTypes = {
-    data: PropTypes.array.isRequired
+    data: PropTypes.array.isRequired,
+    isStepMode: PropTypes.bool //演示模式需要标注不能下子的区域
   };
 
   constructor(props) {
@@ -27,17 +28,32 @@ export default class CheckerBoard extends Component {
     </View>
   )
 
-  row = (activeIndex, columnIndex, rowIndex) => (
-    <View key={rowIndex} style={styles.row}>
-      <CheckerBoardItem columnIndex={columnIndex}
-                        rowIndex={rowIndex}
-                        active={activeIndex === rowIndex}
-      />
-    </View>
-  );
+  row = (activeIndex, columnIndex, rowIndex) => {
+    const {data, isStepMode} = this.props;
+    //x 和 y 距离目标点距离一样的禁用
+    const disabled = data.filter((row, column) => {
+      if (row === -1) {
+        return false;
+      }
+      if (columnIndex === column && rowIndex === row) {
+        return false;
+      }
+      return Math.abs(rowIndex - row) === Math.abs(columnIndex - column);
+    }).length !== 0;
+
+    return (
+      <View key={rowIndex} style={styles.row}>
+        <CheckerBoardItem columnIndex={columnIndex}
+                          rowIndex={rowIndex}
+                          active={activeIndex === rowIndex}
+                          disabled={isStepMode && disabled}
+        />
+      </View>
+    )
+  };
 
   render() {
-    const {data} = this.props;
+    const {data, isStepMode} = this.props;
 
     const column = data.map(this.column);
 

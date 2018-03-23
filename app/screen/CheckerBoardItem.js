@@ -15,6 +15,7 @@ export default class CheckerBoardItem extends Component {
     rowIndex: PropTypes.number.isRequired,
     columnIndex: PropTypes.number.isRequired,
     active: PropTypes.bool,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {
@@ -23,12 +24,20 @@ export default class CheckerBoardItem extends Component {
   }
 
   render() {
-    const {rowIndex, columnIndex, active} = this.props;
+    const {rowIndex, columnIndex, active, disabled} = this.props;
 
-    const backgroundColor = !!((rowIndex + columnIndex)%2) ? '#fff' : '#000';
+    let backgroundColor = !!((rowIndex + columnIndex)%2) ? '#fff' : '#000';
+    let opacity = 1;
+
+    if (disabled) {
+      opacity = 0.5;
+      if (backgroundColor === '#fff') {
+        backgroundColor = '#666';
+      }
+    }
 
     return (
-      <View style={[styles.container, {backgroundColor}]}>
+      <View style={[styles.container, {backgroundColor, opacity}]}>
         {active && <Icon
           name='spa'
           size={25}
