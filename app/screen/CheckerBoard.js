@@ -32,14 +32,17 @@ export default class CheckerBoard extends Component {
     const {data, isStepMode} = this.props;
     //x 和 y 距离目标点距离一样的禁用
     const disabled = data.filter((row, column) => {
-      if (row === -1) {
-        return false;
-      }
-      if (columnIndex === column && rowIndex === row) {
-        return false;
-      }
-      return Math.abs(rowIndex - row) === Math.abs(columnIndex - column);
-    }).length !== 0;
+        if (row === -1) {
+          return false;
+        }
+        if (columnIndex === column && rowIndex === row) {
+          return false;
+        }
+        if (columnIndex === column || rowIndex === row) {
+          return true;
+        }
+        return Math.abs(rowIndex - row) === Math.abs(columnIndex - column);
+      }).length !== 0;
 
     return (
       <View key={rowIndex} style={styles.row}>

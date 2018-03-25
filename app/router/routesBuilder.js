@@ -12,9 +12,10 @@ const routes = MainRoutes.reduce((per, {id, title, screen}) => ({
   ...per,
   [id]: {
     screen: screen,
-    navigationOptions: {
-      headerTitle: title
-    }
+    navigationOptions: props => ({
+      headerTitle: title,
+      ...props,
+    })
   }
 }), {});
 
