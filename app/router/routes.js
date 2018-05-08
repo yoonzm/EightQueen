@@ -15,12 +15,12 @@ export const MainRoutes = [
   // },
   {
     id: 'Home',
-    title: 'Home',
+    title: '首页',
     screen: Screens.Home
   },
   {
     id: 'Detail',
-    title: 'Detail',
+    title: '详情',
     screen: Screens.Detail
   },
 ];

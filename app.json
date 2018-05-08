@@ -11,5 +11,7 @@
     "android": {
       "package": "com.eightQueen"
     }
-  }
+  },
+  "name": "eightQueen",
+  "displayName": "eightQueen"
 }
